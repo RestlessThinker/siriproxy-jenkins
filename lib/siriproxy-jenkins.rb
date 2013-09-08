@@ -7,7 +7,7 @@ class SiriProxy::Plugin::Jenkins < SiriProxy::Plugin
   	@jenkins = Ci::Jenkins.new( @config['jenkins_url'] )
   end
 
-  listen_for /what is the status of job (.+)/i do |jobName|
+  listen_for /what is the status of job (.$)/i do |jobName|
   	jobs = jenkins.list_all_job_names
   	if jobs.include?( jobName )
 	  	status = jenkins.current_status_on_job( jobName )
