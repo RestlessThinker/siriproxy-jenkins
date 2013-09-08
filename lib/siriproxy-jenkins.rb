@@ -1,5 +1,8 @@
 require 'rubygems'
-require  'jenkins-remote-api'
+require 'jenkins-remote-api'
+require 'cora'
+require 'siri_objects'
+require 'pp'
 
 class SiriProxy::Plugin::Jenkins < SiriProxy::Plugin
   def initialize( config = {} )	
