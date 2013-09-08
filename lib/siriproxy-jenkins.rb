@@ -8,9 +8,9 @@ class SiriProxy::Plugin::Jenkins < SiriProxy::Plugin
   end
 
   listen_for /status of job (.+)/i do |jobName|
-  	jobs = jenkins.list_all_job_names
+  	jobs = @jenkins.list_all_job_names
   	if jobs.include?( jobName )
-	  	status = jenkins.current_status_on_job( jobName )
+	  	status = @jenkins.current_status_on_job( jobName )
 	  	say "The current status on job #{jobName} is: "
   	else
   		say "I'm sorry, I couldn't find the job #{jobName}"
