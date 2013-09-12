@@ -1,24 +1,34 @@
 require 'rubygems'
-require 'jenkins-remote-api'
+require 'jenkins_api_client'
 require 'cora'
 require 'siri_objects'
 require 'pp'
 
 class SiriProxy::Plugin::Jenkins < SiriProxy::Plugin
-  def initialize( config = {} )	
-  	@config = config
-  	@jenkins = Ci::Jenkins.new( @config['jenkins_url'] )
+  def initialize( config = {} )
+        @config = config
+        @jenkins = JenkinsApi::Client.new( :server_ip =>  @config['jenkins_url'] )
   end
 
   listen_for /status of job (.+)/i do |jobName|
-  	jobs = @jenkins.list_all_job_names
-  	if jobs.include?( jobName )
-	  	status = @jenkins.current_status_on_job( jobName )
-	  	say "The current status on job #{jobName} is: "
-  	else
-  		say "I'm sorry, I couldn't find the job #{jobName}"
-  	end
+        #jobs = @jenkins.job.list( jobName, true )
+        if @jenkins.job.exists?( jobName )
+                status = @jenkins.job.get_current_build_status( jobName )
+                say "The current status on job #{jobName} is: #{status}"
+        else
+                say "I couldn't find a job with the name #{jobName}"
+        end
 
-  	request_completed
+        request_completed
+  end
+
+  listen_for /build job (.+)/i do |jobName|
+        if @jenkins.job.exists?( jobName )
+                job_id = @jenkins.job.build( jobName, {}, true )
+                say "Building job #{jobName} build number is #{job_id}"
+        else
+                say "I couldn't find a job with the name #{jobName}"
+        end
+        request_completed
   end
 end
